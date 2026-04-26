@@ -50,7 +50,8 @@ def create_app() -> FastAPI:
         debug_token = set_debug_state(debug_state)
 
         try:
-            configured_store = service.shopify_client.shop_name
+            if request.store_url:
+                service.shopify_client.validate_store_url(request.store_url)
             timezone_name = await service.get_timezone()
 
             if is_unsafe_operation(request.message):

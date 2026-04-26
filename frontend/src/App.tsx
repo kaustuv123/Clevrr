@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { sendChat } from "./api";
 import type { ChatBlock, ChatResponse } from "./types";
 
@@ -10,6 +10,22 @@ type MessageItem = {
   meta?: ChatResponse["meta"];
   debug?: ChatResponse["debug"];
 };
+
+const SAMPLE_QUESTIONS = [
+  "How many orders were placed in the last 7 days?",
+  "Which products sold the most last month?",
+  "Show a table of revenue by city.",
+  "Who are my repeat customers?",
+  "What is the AOV trend this month?",
+  "Can you recommend what product to promote based on sales?"
+];
+
+const LOADING_STAGES = [
+  "Reading Shopify context",
+  "Fetching store data",
+  "Running analysis",
+  "Preparing the answer"
+];
 
 function renderBlock(block: ChatBlock, index: number) {
   if (block.type === "text") {
@@ -49,8 +65,8 @@ function renderBlock(block: ChatBlock, index: number) {
 
 function debugSummary(message: MessageItem): string | null {
   if (message.role !== "assistant" || !message.meta) return null;
-  const partial = message.meta.partial_data ? "partial-data" : "complete-data";
-  return `${message.meta.timezone} | ${message.meta.duration_ms}ms | ${partial}`;
+  const partial = message.meta.partial_data ? "Partial data" : "Complete data";
+  return `${message.meta.timezone} / ${message.meta.duration_ms}ms / ${partial}`;
 }
 
 function generateId(): string {
@@ -65,7 +81,21 @@ export function App() {
   const [messages, setMessages] = useState<MessageItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
+  const [loadingIndex, setLoadingIndex] = useState<number>(0);
   const sessionId = useMemo(() => generateId(), []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      setLoadingIndex(0);
+      return;
+    }
+
+    const intervalId = window.setInterval(() => {
+      setLoadingIndex((current) => (current + 1) % LOADING_STAGES.length);
+    }, 1200);
+
+    return () => window.clearInterval(intervalId);
+  }, [isLoading]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -107,12 +137,26 @@ export function App() {
   return (
     <div className="page">
       <header className="topbar">
-        <h1>Shopify Analyst Agent</h1>
-        <p>Interview-first v1 (FastAPI + LangGraph ReAct + Typed UI blocks)</p>
+        <h1>Shopify Analyst</h1>
       </header>
 
       <main className="layout">
         <section className="chat-panel">
+          <div className="sample-rail" aria-label="Sample questions">
+            <div className="sample-grid">
+              {SAMPLE_QUESTIONS.map((question) => (
+                <button
+                  className="sample-question"
+                  key={question}
+                  type="button"
+                  onClick={() => setPrompt(question)}
+                >
+                  {question}
+                </button>
+              ))}
+            </div>
+          </div>
+
           <form className="input-form" onSubmit={onSubmit}>
             <label>
               Ask a question
@@ -124,13 +168,19 @@ export function App() {
               />
             </label>
             <button type="submit" disabled={isLoading}>
-              {isLoading ? "Analyzing..." : "Send"}
+              {isLoading ? "Working" : "Send"}
             </button>
           </form>
 
           {error ? <div className="error-banner">{error}</div> : null}
 
           <div className="messages" aria-live="polite">
+            {!messages.length && !isLoading ? (
+              <div className="empty-state">
+                Ask a store question or choose a sample above to begin.
+              </div>
+            ) : null}
+
             {messages.map((message) => (
               <article key={message.id} className={`message ${message.role}`}>
                 <div className="message-label">{message.role === "user" ? "You" : "Agent"}</div>
@@ -139,12 +189,27 @@ export function App() {
                 {message.meta ? <div className="message-meta">{debugSummary(message)}</div> : null}
               </article>
             ))}
+
+            {isLoading ? (
+              <article className="message assistant loading-message">
+                <div className="message-label">Agent</div>
+                <div className="loading-row">
+                  <span className="loading-dots" aria-hidden="true">
+                    <span />
+                    <span />
+                    <span />
+                  </span>
+                  <span>{LOADING_STAGES[loadingIndex]}</span>
+                </div>
+                <div className="loading-bar" aria-hidden="true" />
+              </article>
+            ) : null}
           </div>
         </section>
 
         <aside className="debug-panel">
           <h2>Debug Trace</h2>
-          <p>Sanitized execution diagnostics for interview walkthroughs.</p>
+          <p>Latest sanitized execution details.</p>
           {messages
             .filter((message) => message.role === "assistant" && message.debug)
             .slice(-1)

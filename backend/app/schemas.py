@@ -6,6 +6,10 @@ from pydantic import BaseModel, Field
 class ChatRequest(BaseModel):
     message: str = Field(..., min_length=1, description="User question to the Shopify analysis agent.")
     session_id: str = Field(..., min_length=1, description="Session identifier used for per-session memory.")
+    store_url: str | None = Field(
+        default=None,
+        description="Optional Shopify store URL. If supplied, it must match the configured store.",
+    )
 
 
 class TextBlock(BaseModel):
@@ -49,4 +53,3 @@ class ChatResponse(BaseModel):
     blocks: list[ChatBlock]
     meta: ResponseMeta
     debug: DebugPayload
-

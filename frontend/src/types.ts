@@ -43,5 +43,5 @@ export type ChatResponse = {
 export type ChatRequest = {
   message: string;
   session_id: string;
+  store_url?: string;
 };
-
