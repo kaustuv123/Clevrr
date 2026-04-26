@@ -1,0 +1,31 @@
+HTTP/2 200 
+date: Sat, 25 Apr 2026 06:45:01 GMT
+content-type: application/json; charset=utf-8
+cf-ray: 9f1b61e07a855506-DEL
+vary: Accept-Encoding,Sec-Fetch-Site
+referrer-policy: origin-when-cross-origin
+x-frame-options: DENY
+x-stats-userid: 
+x-stats-apiclientid: 265186246657
+x-stats-apipermissionid: 546590752861
+x-shopify-api-version: 2025-07
+x-shopify-api-version-warning: https://shopify.dev/concepts/about-apis/versioning
+x-shopify-shop-api-call-limit: 1/40
+strict-transport-security: max-age=7889238
+server-timing: processing;dur=1760, verdict_flag_enabled;desc="count=48";dur=2.061, _y;desc="7389563a-60f7-4915-a29f-d25be38d70fd", _s;desc="ca55aad1-35f3-4ad8-852e-19e004c92f2e"
+server-timing: cfRequestDuration;dur=2116.999865
+server-timing: ipv6
+content-security-policy: default-src 'self' data: blob: 'unsafe-inline' 'unsafe-eval' https://* shopify-pos://*; block-all-mixed-content; child-src 'self' https://* shopify-pos://*; connect-src 'self' wss://* https://*; frame-ancestors 'none'; img-src 'self' data: blob: https:; script-src https://cdn.shopify.com https://cdn.shopifycdn.net https://checkout.pci.shopifyinc.com https://checkout.pci.shopifyinc.com/build/04ed4e1/card_fields.js https://api.stripe.com https://mpsnare.iesnare.com https://appcenter.intuit.com https://www.paypal.com https://js.braintreegateway.com https://c.paypal.com https://maps.googleapis.com https://www.google-analytics.com https://v.shopify.com 'self' 'unsafe-inline' 'unsafe-eval'; upgrade-insecure-requests; report-uri /csp-report?source%5Baction%5D=index&source%5Bapp%5D=Shopify&source%5Bcontroller%5D=admin%2Forders&source%5Bsection%5D=admin_api&source%5Buuid%5D=8a5b4a3d-79d1-4e61-ad96-c946f3376759-1777099499; report-to shopify-csp
+x-content-type-options: nosniff
+x-download-options: noopen
+x-permitted-cross-domain-policies: none
+x-xss-protection: 1; mode=block
+reporting-endpoints: shopify-csp="/csp-report?source%5Baction%5D=index&source%5Bapp%5D=Shopify&source%5Bcontroller%5D=admin%2Forders&source%5Bsection%5D=admin_api&source%5Buuid%5D=8a5b4a3d-79d1-4e61-ad96-c946f3376759-1777099499"
+x-dc: gcp-asia-southeast1,gcp-us-east1,gcp-us-east1
+x-request-id: 8a5b4a3d-79d1-4e61-ad96-c946f3376759-1777099499
+alt-svc: h3=":443"; ma=86400
+cf-cache-status: DYNAMIC
+report-to: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v4?s=ss8AGV2NNK7oe6khZiMR4qm%2FCGiVgM5w%2Bfa1%2BRDBLmjIo6u3uDgUEX4VH0gkRoDI46ttdVvDVs93fsiZz12KFSbyqDrFMiVM1SkjyN9FaFfyzbrIbcAnB71HbgIuDim0Yoqq4M12g0KGJyAoBsItO6tAtsb2T5c%3D"}],"group":"cf-nel","max_age":604800}
+nel: {"success_fraction":0.01,"report_to":"cf-nel","max_age":604800}
+server: cloudflare
+
