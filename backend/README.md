@@ -19,8 +19,10 @@
 
 ## API contract
 - `POST /api/chat`
-   - request: `message`, `session_id`
+   - request: `message`, `session_id`, optional `store_url`
   - response: `answer`, `blocks[]`, `meta`, `debug`
+
+If `store_url` is omitted, the API uses the configured `SHOP_NAME`. If it is provided, it must validate against the configured Shopify store. All Shopify access remains GET-only.
 
 ## Gemini model notes
 - Tool-calling in this project is confirmed working with `gemini-2.5-pro`.

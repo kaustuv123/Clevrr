@@ -1,19 +1,27 @@
-# Shopify Agent Assignment (Interview-First v1)
+# Shopify Analyst
 
-This repository implements a minimal, explainable Shopify analytics agent with:
+This repository implements a minimal, explainable Shopify analytics assistant with:
 - **Backend:** FastAPI + LangGraph ReAct + LangChain tools
 - **Frontend:** React + Vite + TypeScript
 - **Data source:** Shopify Admin REST API (GET-only)
 - **LLM:** Gemini (`GEMINI_API_KEY` + `GEMINI_MODEL` from env)
 
-## What this v1 supports
-- Orders in last 7 days
-- Top-selling products this month
+## What it supports now
+The app is built around read-only Shopify analytics questions, including:
+- Orders placed in the last 7 days
+- Top-selling products last month / this month
+- Revenue grouped by city
 - Repeat customers
+- Average order value trends
+- Sales-based product promotion recommendations
+
+The runtime path uses live Shopify data only. There is no fixture fallback in normal app usage.
 
 ## Architecture
 - `POST /api/chat` handles one chat turn.
 - `session_id` maps to LangGraph thread memory (per-session context).
+- The configured Shopify store is the default source of truth.
+- `store_url` is optional in the API request. If provided, it must match the configured store.
 - Tools:
   - `get_shopify_data` (canonical GET-only tool)
   - `get_orders_data`, `get_products_data`, `get_customers_data` (thin wrappers)
@@ -24,7 +32,7 @@ This repository implements a minimal, explainable Shopify analytics agent with:
   - pagination with page cap + partial-data marker
   - 429 retry with backoff
   - malformed response handling
-- Frontend renders typed `blocks[]` (`text`, `table`) and a sanitized debug panel.
+- Frontend renders typed `blocks[]` (`text`, `table`), compact sample-question tiles, loading stages, response metadata, and a sanitized debug panel.
 
 ## Agent prompt strategy
 System instructions enforce:
@@ -33,6 +41,18 @@ System instructions enforce:
 3. no raw code in user-facing output
 4. tool-based analysis and grounded metrics
 5. concise business-style responses in a strict JSON shape
+
+## Frontend behavior
+- Header shows only the app name: `Shopify Analyst`.
+- The user does not need to enter a store URL.
+- Sample questions appear as small clickable tiles in a manually scrollable picker.
+- Clicking a sample fills the textarea.
+- Loading uses rotating client-side stages:
+  - Reading Shopify context
+  - Fetching store data
+  - Running analysis
+  - Preparing the answer
+- Assistant responses render as clean panels; tables use sticky headers, zebra rows, and horizontal overflow protection.
 
 ## Setup (local)
 1. Copy `.env.example` to `.env` and fill all values.
@@ -68,7 +88,16 @@ Request:
 }
 ```
 
-Store host is sourced from environment (`SHOP_NAME`; `SHOPIFY_SHOP_NAME` remains supported for compatibility).
+Optional store override, only accepted when it matches the configured store:
+```json
+{
+  "message": "How many orders did we get in the last 7 days?",
+  "session_id": "session-123",
+  "store_url": "your-store.myshopify.com"
+}
+```
+
+If `store_url` is omitted, the backend uses `SHOP_NAME` from the environment. `SHOPIFY_SHOP_NAME` remains supported for compatibility.
 
 Response:
 ```json
@@ -104,13 +133,17 @@ Response:
   ```
 
 ## Known issues / limits
-- V1 scope intentionally optimized for explainability over broad query coverage.
-- LangSmith tracing is not wired in this version.
-- Chart rendering is intentionally deferred.
-- Live Shopify data only; no runtime fixture fallback.
+- No token streaming in this version; chat uses normal request/response calls.
+- Chart rendering is deferred. The response contract is ready for typed UI blocks, but the frontend currently renders text and tables.
+- LangSmith tracing is not wired. The app instead returns a sanitized local debug trace.
+- Query quality depends on Shopify API availability and the configured Gemini model's tool-calling stability.
+- Pagination is intentionally capped to keep calls bounded; responses mark `partial_data` when capped data may affect the answer.
+- Runtime uses live Shopify data only; this is intentional so the assistant stays grounded in the connected store.
 
 ## Sample questions
 1. How many orders were placed in the last 7 days?
 2. Which products sold the most last month?
-3. Who are my repeat customers?
-
+3. Show a table of revenue by city.
+4. Who are my repeat customers?
+5. What is the AOV trend this month?
+6. Can you recommend what product to promote based on sales?
